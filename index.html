@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conversor de monedas</title>
+  <style>
+    :root{--r1:#4a0817;--r2:#8f1030;--p1:#ff7aa2;--b:#ffffff}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--b);
+      background:linear-gradient(160deg,var(--r1),var(--r2));
+      font-family:Helvetica,Arial,sans-serif;display:flex;justify-content:center;padding:24px}
+    main{width:100%;max-width:420px}
+    h1{text-align:center;font-size:1.8rem;margin:8px 0 24px;
+      padding-bottom:12px;border-bottom:4px solid var(--p1)}
+    label{display:block;margin:16px 0 6px;font-weight:700}
+    input{width:100%;font:inherit;font-size:1.2rem;padding:14px;border-radius:12px;
+      border:2px solid var(--p1);background:rgba(255,255,255,.12);color:var(--b)}
+    input::placeholder{color:rgba(255,255,255,.6)}
+    .tasas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .res{margin-top:24px;display:grid;gap:12px}
+    .card{background:linear-gradient(135deg,#e0245e,#b3122f);
+      border-radius:16px;padding:16px;text-align:center}
+    .card small{font-weight:700;font-size:1rem}
+    .card strong{display:block;font-size:2rem;margin-top:4px}
+    .nota{margin-top:20px;font-size:.85rem;text-align:center;opacity:.85}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Conversor de monedas</h1>
+
+    <label for="cop">Valor en pesos colombianos (COP)</label>
+    <input id="cop" type="number" inputmode="decimal" placeholder="Ej: 500000">
+
+    <div class="tasas">
+      <div>
+        <label for="tusd">1 USD = ? COP</label>
+        <input id="tusd" type="number" inputmode="decimal" value="3269.88">
+      </div>
+      <div>
+        <label for="teur">1 EUR = ? COP</label>
+        <input id="teur" type="number" inputmode="decimal" value="3679.37">
+      </div>
+    </div>
+
+    <div class="res">
+      <div class="card"><small>Dólares (USD)</small><strong id="rusd">US$ 0,00</strong></div>
+      <div class="card"><small>Euros (EUR)</small><strong id="reur">€ 0,00</strong></div>
+    </div>
+
+    <p class="nota">Tasas de referencia del 10 de noviembre de 2026. Puedes cambiarlas por la tasa del día.</p>
+  </main>
+
+  <script>
+    (function(){
+      const c = document.createElement('canvas');
+      c.width = c.height = 180;
+      const x = c.getContext('2d');
+
+      const fondo = x.createLinearGradient(0, 0, 180, 180);
+      fondo.addColorStop(0, '#f9e27d');
+      fondo.addColorStop(1, '#c8921a');
+      x.fillStyle = fondo;
+      x.fillRect(0, 0, 180, 180);
+
+      const moneda = x.createLinearGradient(40, 40, 140, 140);
+      moneda.addColorStop(0, '#fff3b0');
+      moneda.addColorStop(1, '#e0a800');
+      x.beginPath();
+      x.arc(90, 90, 64, 0, Math.PI * 2);
+      x.fillStyle = moneda;
+      x.fill();
+      x.lineWidth = 6;
+      x.strokeStyle = '#a87400';
+      x.stroke();
+
+      x.beginPath();
+      x.arc(90, 90, 50, 0, Math.PI * 2);
+      x.lineWidth = 3;
+      x.strokeStyle = '#b8860b';
+      x.stroke();
+
+      x.strokeStyle = '#7a4f00';
+      x.lineWidth = 9;
+      x.lineCap = 'round';
+      x.beginPath();
+      x.arc(90, 90, 17, 0, Math.PI * 2);
+      x.stroke();
+      [45, 135, 225, 315].forEach(a => {
+        const r = a * Math.PI / 180;
+        x.beginPath();
+        x.moveTo(90 + Math.cos(r) * 26, 90 + Math.sin(r) * 26);
+        x.lineTo(90 + Math.cos(r) * 40, 90 + Math.sin(r) * 40);
+        x.stroke();
+      });
+
+      const l = document.createElement('link');
+      l.rel = 'apple-touch-icon';
+      l.href = c.toDataURL('image/png');
+      document.head.appendChild(l);
+    })();
+
+    const $ = id => document.getElementById(id);
+    const fmt = n => n.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+    function calcular(){
+      const cop = parseFloat($('cop').value);
+      const usd = parseFloat($('tusd').value);
+      const eur = parseFloat($('teur').value);
+      $('rusd').textContent = 'US$ ' + (cop > 0 && usd > 0 ? fmt(cop / usd) : '0,00');
+      $('reur').textContent = '€ ' + (cop > 0 && eur > 0 ? fmt(cop / eur) : '0,00');
+    }
+
+    ['cop', 'tusd', 'teur'].forEach(id => $(id).addEventListener('input', calcular));
+    calcular();
+  </script>
+</body>
+</html>
